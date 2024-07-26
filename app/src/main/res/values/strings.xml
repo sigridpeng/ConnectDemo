@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">ConnectDemo</string>
+    <string name="bluetooth_page">Bluetooth Page</string>
+    <string name="enable_bluetooth">Enable Bluetooth</string>
+    <string name="wifi_page">WiFi Page</string>
+    <string name="enable_wifi">Enable WiFi</string>
+    <string name="please_grant_bluetooth_permission">Please grant Bluetooth permission.</string>
+    <string name="hidden_network">Hidden Network</string>
+    <string name="all_permissions_must_be_granted_for_the_application_to_function_properly">All permissions must be granted for the application to function properly.</string>
+    <string name="all_permissions_must_be_granted_to_access_this_page">All permissions must be granted to access this page.</string>
+    <string name="go_to_wifi_page">Go to WiFi Page</string>
+    <string name="go_to_bluetooth_page">Go to Bluetooth Page</string>
 </resources>

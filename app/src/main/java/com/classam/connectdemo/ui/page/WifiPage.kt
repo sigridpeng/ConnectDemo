@@ -1,4 +1,4 @@
-package com.classam.connectdemo
+package com.classam.connectdemo.ui.page
 
 import android.content.Context
 import android.content.Intent
@@ -12,9 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.classam.connectdemo.R
+import com.classam.connectdemo.ui.viewmodel.ScanResultWrapper
+import com.classam.connectdemo.ui.viewmodel.WifiViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +40,7 @@ fun WifiPage(viewModel: WifiViewModel = viewModel(), navController: NavControlle
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "WiFi Page") },
+                title = { Text(text = stringResource(R.string.wifi_page)) },
                 actions = { Text(text = currentTime) }
             )
         }
@@ -60,7 +64,7 @@ fun WifiPage(viewModel: WifiViewModel = viewModel(), navController: NavControlle
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Enable WiFi")
+                    Text(stringResource(R.string.enable_wifi))
                 }
             } else {
                 LazyColumn(
@@ -79,7 +83,9 @@ fun WifiPage(viewModel: WifiViewModel = viewModel(), navController: NavControlle
 
 @Composable
 fun WifiItem(scanResultWrapper: ScanResultWrapper) {
-    Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)) {
         Text(text = scanResultWrapper.displaySSID, modifier = Modifier.weight(1f))
         Text(text = "RSSI: ${scanResultWrapper.scanResult.level} dBm", style = MaterialTheme.typography.bodySmall)
     }

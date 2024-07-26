@@ -1,4 +1,4 @@
-package com.classam.connectdemo
+package com.classam.connectdemo.ui.viewmodel
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -9,9 +9,12 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.classam.connectdemo.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -42,18 +45,18 @@ class BluetoothViewModel : ViewModel() {
         if (hasBluetoothScanPermission(context)) {
             startScanningBluetoothDevices()
         } else {
-            // 处理未授予权限的情况
+            Toast.makeText(context,
+                context.getString(R.string.please_grant_bluetooth_permission), Toast.LENGTH_SHORT).show()
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun startScanningBluetoothDevices() {
-        // 开始蓝牙扫描
         bluetoothAdapter?.bluetoothLeScanner?.startScan(scanCallback)
     }
 
+    @SuppressLint("MissingPermission")
     fun stopScanningBluetoothDevices() {
-        // 停止蓝牙扫描
         bluetoothAdapter?.bluetoothLeScanner?.stopScan(scanCallback)
     }
 
@@ -76,13 +79,13 @@ class BluetoothViewModel : ViewModel() {
 
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
-            // 处理扫描失败
+            Log.d("Bluetooth", "Scan Fail")
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun updateBluetoothList(device: BluetoothDevice) {
         val currentList = _bluetoothList.value.toMutableList()
-        // 如果设备名称为空，则使用设备地址
         val deviceName = device.name ?: device.address
         if (!currentList.contains(deviceName)) {
             currentList.add(deviceName)

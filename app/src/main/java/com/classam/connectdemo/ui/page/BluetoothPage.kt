@@ -1,5 +1,6 @@
-package com.classam.connectdemo
+package com.classam.connectdemo.ui.page
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import androidx.compose.foundation.layout.*
@@ -9,10 +10,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.classam.connectdemo.R
+import com.classam.connectdemo.ui.viewmodel.BluetoothViewModel
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BluetoothPage(
@@ -42,7 +47,7 @@ fun BluetoothPage(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Bluetooth Page") },
+                title = { Text(text = stringResource(R.string.bluetooth_page)) },
                 actions = { Text(text = currentTime) }
             )
         }
@@ -62,7 +67,7 @@ fun BluetoothPage(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Enable Bluetooth")
+                    Text(stringResource(R.string.enable_bluetooth))
                 }
             } else {
                 LazyColumn(
@@ -81,7 +86,9 @@ fun BluetoothPage(
 
 @Composable
 fun DeviceItem(deviceName: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)) {
         Text(text = deviceName, modifier = Modifier.weight(1f))
     }
 }

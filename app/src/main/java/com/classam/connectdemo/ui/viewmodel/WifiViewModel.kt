@@ -1,5 +1,6 @@
-package com.classam.connectdemo
+package com.classam.connectdemo.ui.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.classam.connectdemo.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -23,7 +25,7 @@ class WifiViewModel(context: Context) : ViewModel() {
     val wifiList = _wifiList.asStateFlow()
 
     private val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-    val context = context
+    private val context by lazy { context }
 
     private val wifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -61,28 +63,18 @@ class WifiViewModel(context: Context) : ViewModel() {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun scanSuccess() {
         viewModelScope.launch {
             val scanResults = wifiManager.scanResults
-            // Filter or replace empty SSIDs
             val filteredResults = scanResults.map { result ->
                 if (result.SSID.isEmpty()) {
-                    // Replace empty SSID with a placeholder
-                    ScanResultWrapper(result, "Hidden Network")
+                    ScanResultWrapper(result, context.getString(R.string.hidden_network))
                 } else {
                     ScanResultWrapper(result, result.SSID)
                 }
             }.sortedByDescending { it.scanResult.level }
-            _wifiList.value = filteredResults // No type mismatch here
-            // Start a new scan
-            startWifiScan()
-        }
-    }
-
-    private fun scanFailure() {
-        // Handle scan failure (optional)
-        viewModelScope.launch {
-            _wifiList.value = emptyList()
+            _wifiList.value = filteredResults
             startWifiScan()
         }
     }
