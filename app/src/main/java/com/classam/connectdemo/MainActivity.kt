@@ -1,17 +1,25 @@
 package com.classam.connectdemo
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -27,7 +35,9 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val allPermissionsGranted = permissions.entries.all { it.value }
 
-            if (!allPermissionsGranted) {
+            if (allPermissionsGranted) {
+                enableBluetoothAndWifi()  // Enable Bluetooth and WiFi after permissions are granted
+            } else {
                 Toast.makeText(
                     this,
                     "需要授予所有權限才能正常運行應用程序",
@@ -49,8 +59,8 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = "main_page") {
                     composable("main_page") { MainPage(navController) }
-                    composable("wifi_page") { WifiPage(wifiViewModel) }
-                    composable("bluetooth_page") { BluetoothPage() }
+                    composable("wifi_page") { WifiPage(wifiViewModel, navController) }
+                    composable("bluetooth_page") { BluetoothPage(navController) }
                 }
             }
         }
@@ -89,6 +99,8 @@ class MainActivity : ComponentActivity() {
 
         if (permissionsToRequest.isNotEmpty()) {
             requestPermissionLauncher.launch(permissionsToRequest.toTypedArray())
+        } else {
+            enableBluetoothAndWifi()  // If permissions are already granted
         }
     }
 
@@ -131,17 +143,61 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Function to enable Bluetooth and WiFi
+    private fun enableBluetoothAndWifi() {
+        val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled) {
+            // Request user to enable Bluetooth if not already enabled
+            startActivity(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+        }
+
+        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (!wifiManager.isWifiEnabled) {
+            // Request user to enable WiFi if not already enabled
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startActivity(Intent(Settings.Panel.ACTION_WIFI))
+            } else {
+                wifiManager.isWifiEnabled = true
+            }
+        }
+    }
+
     // MainPage composable function
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun MainPage(navController: NavHostController) {
-        Column {
-            Button(onClick = { navigateTo("wifi_page") }) {
-                Text("Go to WiFi Page")
+        Scaffold(
+            topBar = {
+                TopAppBar(title = { Text("Connect Demo") })
             }
-            Button(onClick = { navigateTo("bluetooth_page") }) {
-                Text("Go to Bluetooth Page")
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = { navigateTo("wifi_page") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Go to WiFi Page")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { navigateTo("bluetooth_page") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Go to Bluetooth Page")
+                }
             }
         }
     }
 }
+
 

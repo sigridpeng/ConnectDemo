@@ -27,12 +27,6 @@ class WifiViewModel(context: Context) : ViewModel() {
 
     private val wifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-//            val success = intent?.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false) ?: false
-//            if (success) {
-//                scanSuccess()
-//            } else {
-//                scanFailure()
-//            }
             scanSuccess()
         }
     }
@@ -43,13 +37,21 @@ class WifiViewModel(context: Context) : ViewModel() {
         startWifiScan()
     }
 
-    private fun startUpdatingTime() {
+    fun startUpdatingTime() {
         viewModelScope.launch {
             while (true) {
                 val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
                 _currentTime.value = sdf.format(Date())
                 kotlinx.coroutines.delay(1000)
             }
+        }
+    }
+
+    fun updateWifiNetworks() {
+        if (wifiManager.isWifiEnabled) {
+            startWifiScan()
+        } else {
+            _wifiList.value = emptyList()
         }
     }
 
@@ -92,6 +94,7 @@ class WifiViewModel(context: Context) : ViewModel() {
 }
 
 data class ScanResultWrapper(val scanResult: ScanResult, val displaySSID: String)
+
 
 
 
